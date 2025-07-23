@@ -54,17 +54,49 @@ const useAuth = () => {
         .single();
 
       if (error) {
-        console.error('Error fetching user profile:', error);
-        // If user doesn't exist in users table, create a basic user object
-        const { data: authUser } = await supabase.auth.getUser();
-        if (authUser.user) {
-          setUser({
-            id: authUser.user.id,
-            username: authUser.user.email?.split('@')[0] || 'user',
-            email: authUser.user.email || '',
-            role: 'user',
-            created_at: new Date().toISOString()
-          });
+        if (error.code === 'PGRST116') {
+          // User doesn't exist in users table, create one
+          const { data: authUser } = await supabase.auth.getUser();
+          if (authUser.user) {
+            const newUserProfile = {
+              id: authUser.user.id,
+              username: authUser.user.email?.split('@')[0] || 'user',
+              email: authUser.user.email || '',
+              role: 'user',
+            };
+
+            const { error: insertError } = await supabase
+              .from('users')
+              .insert([newUserProfile]);
+
+            if (insertError) {
+              console.error('Error creating user profile:', insertError);
+              // Fallback to temporary user object
+              setUser({
+                ...newUserProfile,
+                created_at: new Date().toISOString()
+              });
+            } else {
+              // Re-fetch the newly created user profile
+              const { data: newData, error: refetchError } = await supabase
+                .from('users')
+                .select('*')
+                .eq('id', userId)
+                .single();
+
+              if (refetchError) {
+                console.error('Error re-fetching user profile:', refetchError);
+                setUser({
+                  ...newUserProfile,
+                  created_at: new Date().toISOString()
+                });
+              } else {
+                setUser(newData);
+              }
+            }
+          }
+        } else {
+          console.error('Error fetching user profile:', error);
         }
       } else {
         setUser(data);
