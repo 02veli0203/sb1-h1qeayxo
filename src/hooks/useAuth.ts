@@ -87,10 +87,16 @@ const useAuth = () => {
             if (insertError) {
               console.error('Error creating user profile:', insertError);
               // Fallback to temporary user object
-              setUser({
-                ...newUserProfile,
-                created_at: new Date().toISOString()
-              });
+              setAuthState(prev => ({
+                ...prev,
+                user: authUser.user,
+                userProfile: {
+                  ...newUserProfile,
+                  created_at: new Date().toISOString()
+                },
+                isAuthenticated: true,
+                isLoading: false
+              }));
             } else {
               // Re-fetch the newly created user profile
               const { data: newData, error: refetchError } = await supabase
@@ -101,12 +107,24 @@ const useAuth = () => {
 
               if (refetchError) {
                 console.error('Error re-fetching user profile:', refetchError);
-                setUser({
-                  ...newUserProfile,
-                  created_at: new Date().toISOString()
-                });
+                setAuthState(prev => ({
+                  ...prev,
+                  user: authUser.user,
+                  userProfile: {
+                    ...newUserProfile,
+                    created_at: new Date().toISOString()
+                  },
+                  isAuthenticated: true,
+                  isLoading: false
+                }));
               } else {
-                setUser(newData);
+                setAuthState(prev => ({
+                  ...prev,
+                  user: authUser.user,
+                  userProfile: newData,
+                  isAuthenticated: true,
+                  isLoading: false
+                }));
               }
             }
           }
@@ -114,12 +132,21 @@ const useAuth = () => {
           console.error('Error fetching user profile:', error);
         }
       } else {
-        setUser(data);
+        setAuthState(prev => ({
+          ...prev,
+          user: prev.user,
+          userProfile: data,
+          isAuthenticated: true,
+          isLoading: false
+        }));
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
     } finally {
-      setIsLoading(false);
+      setAuthState(prev => ({
+        ...prev,
+        isLoading: false
+      }));
     }
   };
 
@@ -136,12 +163,18 @@ const useAuth = () => {
         if (session?.user && mounted) {
           await fetchUserProfile(session.user.id);
         } else if (mounted) {
-          setIsLoading(false);
+          setAuthState(prev => ({
+            ...prev,
+            isLoading: false
+          }));
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
         if (mounted) {
-          setIsLoading(false);
+          setAuthState(prev => ({
+            ...prev,
+            isLoading: false
+          }));
         }
       }
     };
@@ -154,8 +187,13 @@ const useAuth = () => {
         if (session?.user && mounted) {
           await fetchUserProfile(session.user.id);
         } else if (mounted) {
-          setUser(null);
-          setIsLoading(false);
+          setAuthState(prev => ({
+            ...prev,
+            user: null,
+            userProfile: null,
+            isAuthenticated: false,
+            isLoading: false
+          }));
         }
       }
     );
@@ -204,7 +242,12 @@ const useAuth = () => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (!error) {
-      setUser(null);
+      setAuthState(prev => ({
+        ...prev,
+        user: null,
+        userProfile: null,
+        isAuthenticated: false
+      }));
     }
     return { error };
   };

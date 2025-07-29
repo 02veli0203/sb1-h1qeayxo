@@ -121,7 +121,6 @@ const Account = () => {
               <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 Hesabım
               </h1>
-              <p className="text-gray-600 mt-2">Hoş geldiniz, {user?.username}!</p>
               <p className="text-gray-600 mt-2">Hoş geldiniz, {authUserProfile?.username}!</p>
             </div>
             <div className="flex items-center space-x-4">
