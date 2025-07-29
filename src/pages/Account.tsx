@@ -33,7 +33,7 @@ const Account = () => {
     city: '',
     zipCode: ''
   });
-  const { user, signOut, isAuthenticated } = useAuth();
+  const { userProfile: authUserProfile, signOut, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,17 +51,17 @@ const Account = () => {
     setOrders(storedOrders);
 
     // Load user profile
-    if (user) {
+    if (authUserProfile) {
       setUserProfile({
-        fullName: user.username || '',
-        email: user.email || '',
+        fullName: authUserProfile.username || '',
+        email: authUserProfile.email || '',
         phone: '',
         address: '',
         city: '',
         zipCode: ''
       });
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, authUserProfile, navigate]);
 
   const handleLogout = async () => {
     await signOut();
@@ -122,6 +122,7 @@ const Account = () => {
                 Hesabım
               </h1>
               <p className="text-gray-600 mt-2">Hoş geldiniz, {user?.username}!</p>
+              <p className="text-gray-600 mt-2">Hoş geldiniz, {authUserProfile?.username}!</p>
             </div>
             <div className="flex items-center space-x-4">
               <div className="bg-gradient-to-r from-indigo-100 to-purple-100 p-4 rounded-xl">
@@ -142,8 +143,8 @@ const Account = () => {
                   <User className="h-8 w-8 text-white" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-xl text-gray-900">{user?.username}</h2>
-                  <p className="text-gray-600">{user?.email}</p>
+                  <h2 className="font-bold text-xl text-gray-900">{authUserProfile?.username}</h2>
+                  <p className="text-gray-600">{authUserProfile?.email}</p>
                 </div>
               </div>
 

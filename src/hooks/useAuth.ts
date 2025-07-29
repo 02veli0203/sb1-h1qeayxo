@@ -210,13 +210,14 @@ const useAuth = () => {
   };
 
   return {
-    user,
-    isLoading,
+    user: authState.user,
+    userProfile: authState.userProfile,
+    isLoading: authState.isLoading,
     signIn,
     signUp,
     signOut,
-    isAuthenticated: !!user,
-    isAdmin: user?.role === 'admin',
+    isAuthenticated: authState.isAuthenticated,
+    isAdmin: authState.userProfile?.role === 'admin',
   };
 };
 

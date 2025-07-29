@@ -8,7 +8,7 @@ const Navbar = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const { user, signOut, isAuthenticated } = useAuth();
+  const { userProfile, signOut, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -47,7 +47,7 @@ const Navbar = () => {
                   className="flex items-center space-x-2 text-gray-700 hover:text-indigo-600"
                 >
                   <User className="h-6 w-6" />
-                  <span className="hidden md:block">{user?.username}</span>
+                  <span className="hidden md:block">{userProfile?.username}</span>
                 </button>
                 
                 {isUserMenuOpen && (
@@ -59,7 +59,7 @@ const Navbar = () => {
                     >
                       Hesabım
                     </Link>
-                    {user?.role === 'admin' && (
+                    {userProfile?.role === 'admin' && (
                       <Link
                         to="/admin"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
